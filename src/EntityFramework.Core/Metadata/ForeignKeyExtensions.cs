@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Data.Entity.Utilities;
@@ -25,27 +26,33 @@ namespace Microsoft.Data.Entity.Metadata
                 navigation => navigation.ForeignKey == foreignKey && !navigation.PointsToPrincipal);
         }
 
-        public static IProperty FindRootValueGenerationProperty([NotNull] this IForeignKey foreignKey, int propertyIndex)
+        public static IEnumerable<IProperty> GetRootPrincipals(
+            [NotNull] this IForeignKey foreignKey, int propertyIndex)
         {
             Check.NotNull(foreignKey, "foreignKey");
 
             var principalProperty = foreignKey.ReferencedProperties[propertyIndex];
+            var isForeignKey = false;
             foreach (var nextForeignKey in principalProperty.EntityType.ForeignKeys)
             {
                 for (var nextIndex = 0; nextIndex < nextForeignKey.Properties.Count; nextIndex++)
                 {
                     if (principalProperty == nextForeignKey.Properties[nextIndex])
                     {
-                        var rootPrincipal = FindRootValueGenerationProperty(nextForeignKey, nextIndex);
-                        if (rootPrincipal.GenerateValueOnAdd)
+                        isForeignKey = true;
+
+                        foreach (var rootPrincipal in GetRootPrincipals(nextForeignKey, nextIndex))
                         {
-                            return rootPrincipal;
+                            yield return rootPrincipal;
                         }
                     }
                 }
             }
 
-            return principalProperty;
+            if (!isForeignKey)
+            {
+                yield return principalProperty;
+            }
         }
     }
 }

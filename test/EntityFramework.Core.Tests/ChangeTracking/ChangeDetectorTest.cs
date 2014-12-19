@@ -5,7 +5,6 @@ using System;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Utilities;
 using Microsoft.Framework.DependencyInjection;
 using Moq;
 using Xunit;
@@ -63,7 +62,7 @@ namespace Microsoft.Data.Entity.Tests.ChangeTracking
 
             Assert.Same(principalEntry, stateManager.TryGetEntry(new SimpleEntityKey<int>(entityType, -1)));
 
-            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry))[keyProperty] = 78;
+            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry, new IProperty[0]))[keyProperty] = 78;
             changeDetector.SidecarPropertyChanged(principalEntry, keyProperty);
 
             notifierMock.Verify(m => m.PrincipalKeyPropertyChanged(principalEntry, keyProperty, 77, 78));
@@ -121,7 +120,7 @@ namespace Microsoft.Data.Entity.Tests.ChangeTracking
 
             Assert.Same(principalEntry, stateManager.TryGetEntry(new SimpleEntityKey<int>(entityType, -1)));
 
-            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry))[keyProperty] = 1;
+            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry, new IProperty[0]))[keyProperty] = 1;
             changeDetector.SidecarPropertyChanged(principalEntry, keyProperty);
 
             notifierMock.Verify(m => m.PrincipalKeyPropertyChanged(principalEntry, keyProperty, -1, 1));
@@ -180,7 +179,7 @@ namespace Microsoft.Data.Entity.Tests.ChangeTracking
 
             Assert.Same(principalEntry, stateManager.TryGetEntry(new SimpleEntityKey<int>(entityType, -1)));
 
-            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry))[property] = "Red";
+            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry, new IProperty[0]))[property] = "Red";
             changeDetector.SidecarPropertyChanged(principalEntry, property);
 
             notifierMock.Verify(m => m.PrincipalKeyPropertyChanged(
@@ -239,7 +238,7 @@ namespace Microsoft.Data.Entity.Tests.ChangeTracking
 
             Assert.Same(principalEntry, stateManager.TryGetEntry(new SimpleEntityKey<int>(entityType, -1)));
 
-            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry))[keyProperty] = 77;
+            principalEntry.AddSidecar(new StoreGeneratedValuesFactory().Create(principalEntry, new IProperty[0]))[keyProperty] = 77;
             changeDetector.PropertyChanged(principalEntry, keyProperty);
 
             notifierMock.Verify(m => m.PrincipalKeyPropertyChanged(
