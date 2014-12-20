@@ -90,6 +90,9 @@ namespace Microsoft.Data.Entity.Metadata.Internal
                 return null;
             }
 
+            _foreignKeyPropertiesConfigurationSource = null;
+            _referencedKeyConfigurationSource = null;
+
             return ReplaceForeignKey(
                 Metadata.EntityType,
                 Metadata.ReferencedEntityType,
@@ -130,11 +133,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
             if (Metadata.Properties.SequenceEqual(properties))
             {
-                if (_foreignKeyPropertiesConfigurationSource == null
-                    || configurationSource.Overrides(_foreignKeyPropertiesConfigurationSource.Value))
-                {
-                    _foreignKeyPropertiesConfigurationSource = configurationSource;
-                }
+                _foreignKeyPropertiesConfigurationSource = configurationSource.Max(_foreignKeyPropertiesConfigurationSource);
                 return this;
             }
 
@@ -144,6 +143,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
                 return null;
             }
 
+            _foreignKeyPropertiesConfigurationSource = configurationSource.Max(_foreignKeyPropertiesConfigurationSource);
             return ReplaceForeignKey(configurationSource, dependentProperties: properties);
         }
 
@@ -219,11 +219,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
             if (Metadata.ReferencedProperties.SequenceEqual(properties))
             {
-                if (_referencedKeyConfigurationSource == null
-                    || configurationSource.Overrides(_referencedKeyConfigurationSource.Value))
-                {
-                    _referencedKeyConfigurationSource = configurationSource;
-                }
+                _referencedKeyConfigurationSource = configurationSource.Max(_referencedKeyConfigurationSource);
                 return this;
             }
 
@@ -233,6 +229,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
                 return null;
             }
 
+            _referencedKeyConfigurationSource = configurationSource.Max(_referencedKeyConfigurationSource);
             return ReplaceForeignKey(configurationSource, principalProperties: properties);
         }
 
@@ -320,8 +317,9 @@ namespace Microsoft.Data.Entity.Metadata.Internal
             }
 
             var dependentEntityTypeBuilder = ModelBuilder.Entity(dependentType.Name, configurationSource);
-            var foreignKey =
-                new ForeignKeyConvention().TryGetForeignKey(
+            var foreignKey = foreignKeyProperties == null
+                ? null
+                : new ForeignKeyConvention().TryGetForeignKey(
                     principalType,
                     dependentType,
                     null,
@@ -332,7 +330,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
             var existingForeignKey = foreignKey != null;
             if (!existingForeignKey)
-            { 
+            {
                 if (foreignKeyProperties != null)
                 {
                     foreignKey = dependentType.TryGetForeignKey(foreignKeyProperties);

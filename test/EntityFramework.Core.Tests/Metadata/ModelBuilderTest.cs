@@ -4398,7 +4398,7 @@ namespace Microsoft.Data.Entity.Tests.Metadata
         }
 
         [Fact]
-        public void OneToOne_principal_and_dependent_can_be_flipped_using_principal_with_existing_FK_still_used()
+        public void OneToOne_principal_and_dependent_can_be_flipped_using_principal_existing_FK_not_used()
         {
             var model = new Model();
             var modelBuilder = new ModelBuilder(model);
@@ -4423,13 +4423,14 @@ namespace Microsoft.Data.Entity.Tests.Metadata
                 .OneToOne(e => e.Order, e => e.Details)
                 .ReferencedKey<Order>(e => e.OrderId);
 
-            Assert.Same(fk, dependentType.ForeignKeys.Single());
+            var newFk = dependentType.ForeignKeys.Single(foreignKey => foreignKey != fk);
+            Assert.NotSame(fk, newFk);
             Assert.Equal("Order", dependentType.Navigations.Single().Name);
             Assert.Equal("Details", principalType.Navigations.Single().Name);
-            Assert.Same(fk, dependentType.Navigations.Single().ForeignKey);
-            Assert.Same(fk, principalType.Navigations.Single().ForeignKey);
+            Assert.Same(newFk, dependentType.Navigations.Single().ForeignKey);
+            Assert.Same(newFk, principalType.Navigations.Single().ForeignKey);
             Assert.Equal(new[] { "AnotherCustomerId", "CustomerId", principalKey.Properties.Single().Name }, principalType.Properties.Select(p => p.Name));
-            Assert.Equal(new[] { fk.Properties.Single().Name, "OrderId" }, dependentType.Properties.Select(p => p.Name));
+            Assert.Equal(new[] { fk.Properties.Single().Name, newFk.Properties.Single().Name }, dependentType.Properties.Select(p => p.Name));
             Assert.Empty(principalType.ForeignKeys);
             Assert.Same(principalKey, principalType.Keys.Single());
             Assert.Same(dependentKey, dependentType.Keys.Single());
