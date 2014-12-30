@@ -32,19 +32,29 @@ namespace Microsoft.Data.Entity.Metadata.Internal
         {
             var entityTypeBuilder = ModelBuilder.Entity(Metadata.EntityType.Name, configurationSource);
 
-            foreach (var property in Metadata.Properties)
+            var properties = Metadata.Properties;
+            if (!isRequired)
+            {
+                var nullableTypeProperties = Metadata.Properties.Where(p => p.PropertyType.IsNullableType()).ToList();
+                if (nullableTypeProperties.Any())
+                {
+                    properties = nullableTypeProperties;
+                }
+            }
+
+            foreach (var property in properties)
             {
                 if (!entityTypeBuilder.Property(property.PropertyType, property.Name, configurationSource)
-                    .CanSetRequired(isRequired, ConfigurationSource.Convention))
+                    .CanSetRequired(isRequired, configurationSource))
                 {
                     return false;
                 }
             }
 
-            foreach (var property in Metadata.Properties)
+            foreach (var property in properties)
             {
                 // TODO: Depending on resolution of #723 this may change
-                entityTypeBuilder.Property(property.PropertyType, property.Name, configurationSource).Required(isRequired, ConfigurationSource.Convention);
+                entityTypeBuilder.Property(property.PropertyType, property.Name, configurationSource).Required(isRequired, configurationSource);
             }
 
             return true;
@@ -352,19 +362,48 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
                 if (foreignKey == null)
                 {
+                    if (configurationSource == ConfigurationSource.Explicit
+                        && foreignKeyProperties != null
+                        && foreignKeyProperties.Any())
+                    {
+                        if (referencedProperties == null
+                            || !referencedProperties.Any())
+                        {
+                            referencedProperties = principalType.GetPrimaryKey().Properties;
+                        }
+
+                        if (referencedProperties.Count != foreignKeyProperties.Count)
+                        {
+                            throw new InvalidOperationException(
+                                Strings.ForeignKeyCountMismatch(
+                                    Property.Format(foreignKeyProperties),
+                                    foreignKeyProperties[0].EntityType.Name,
+                                    Property.Format(referencedProperties),
+                                    principalType.Name));
+                        }
+
+                        if (!referencedProperties.Select(p => p.UnderlyingType).SequenceEqual(foreignKeyProperties.Select(p => p.UnderlyingType)))
+                        {
+                            throw new InvalidOperationException(
+                                Strings.ForeignKeyTypeMismatch(
+                                    Property.Format(foreignKeyProperties),
+                                    foreignKeyProperties[0].EntityType.Name, principalType.Name));
+                        }
+                    }
+
                     return null;
                 }
             }
 
-            if (!dependentEntityTypeBuilder.Navigations(navigationToPrincipalName, navigationToDependentName, foreignKey, configurationSource))
-            {
-                if (!existingForeignKey)
-                {
-                    dependentType.RemoveForeignKey(foreignKey);
-                }
-                return null;
-            }
+            var navigationToPrincipalSet = dependentEntityTypeBuilder
+                .Navigation(navigationToPrincipalName, foreignKey, pointsToPrincipal: true, configurationSource: configurationSource);
+            Debug.Assert(navigationToPrincipalSet);
 
+            var principalEntityTypeBuilder = ModelBuilder.Entity(foreignKey.ReferencedEntityType.Name, configurationSource);
+            var navigationToDependentSet = principalEntityTypeBuilder
+                .Navigation(navigationToDependentName, foreignKey, pointsToPrincipal: false, configurationSource: configurationSource);
+            Debug.Assert(navigationToDependentSet);
+            
             var builder = entityTypeBuilder.Relationship(foreignKey, existingForeignKey, configurationSource);
             Debug.Assert(builder != null);
 

@@ -26,9 +26,13 @@ namespace Microsoft.Data.Entity.Metadata.Internal
             if (CanSetRequired(isRequired, configurationSource))
             {
                 if (_isRequiredConfigurationSource == null
-                    || configurationSource.Overrides(_isRequiredConfigurationSource.Value))
+                    && Metadata.IsNullable != null)
                 {
-                    _isRequiredConfigurationSource = configurationSource;
+                    _isRequiredConfigurationSource = ConfigurationSource.Explicit;
+                }
+                else
+                {
+                    _isRequiredConfigurationSource = configurationSource.Max(_isRequiredConfigurationSource);
                 }
 
                 Metadata.IsNullable = !isRequired;
@@ -51,9 +55,19 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
         public virtual bool MaxLength(int maxLength, ConfigurationSource configurationSource)
         {
-            if (configurationSource.CanSet(_maxLengthConfigurationSource, Metadata.MaxLength.HasValue))
+            if (configurationSource.CanSet(_maxLengthConfigurationSource, Metadata.MaxLength.HasValue)
+                || Metadata.MaxLength.Value == maxLength)
             {
-                _maxLengthConfigurationSource = configurationSource;
+                if (_maxLengthConfigurationSource == null
+                    && Metadata.MaxLength != null)
+                {
+                    _maxLengthConfigurationSource = ConfigurationSource.Explicit;
+                }
+                else
+                {
+                    _maxLengthConfigurationSource = configurationSource.Max(_maxLengthConfigurationSource);
+                }
+
                 Metadata.MaxLength = maxLength;
                 return true;
             }
@@ -63,9 +77,19 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
         public virtual bool ConcurrencyToken(bool isConcurrencyToken, ConfigurationSource configurationSource)
         {
-            if (configurationSource.CanSet(_isConcurrencyTokenConfigurationSource, Metadata.IsConcurrencyToken.HasValue))
+            if (configurationSource.CanSet(_isConcurrencyTokenConfigurationSource, Metadata.IsConcurrencyToken.HasValue)
+                || Metadata.IsConcurrencyToken.Value == isConcurrencyToken)
             {
-                _isConcurrencyTokenConfigurationSource = configurationSource;
+                if (_isConcurrencyTokenConfigurationSource == null
+                    && Metadata.IsConcurrencyToken != null)
+                {
+                    _isConcurrencyTokenConfigurationSource = ConfigurationSource.Explicit;
+                }
+                else
+                {
+                    _isConcurrencyTokenConfigurationSource = configurationSource.Max(_isConcurrencyTokenConfigurationSource);
+                }
+
                 Metadata.IsConcurrencyToken = isConcurrencyToken;
                 return true;
             }
@@ -75,9 +99,11 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
         public virtual bool Shadow(bool isShadowProperty, ConfigurationSource configurationSource)
         {
-            if (configurationSource.CanSet(_isShadowPropertyConfigurationSource, true))
+            if (configurationSource.CanSet(_isShadowPropertyConfigurationSource, true)
+                || Metadata.IsShadowProperty == isShadowProperty)
             {
-                _isShadowPropertyConfigurationSource = configurationSource;
+                _isShadowPropertyConfigurationSource = configurationSource.Max(_isShadowPropertyConfigurationSource);
+
                 Metadata.IsShadowProperty = isShadowProperty;
                 return true;
             }
@@ -87,9 +113,19 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
         public virtual bool GenerateValueOnAdd(bool generateValue, ConfigurationSource configurationSource)
         {
-            if (configurationSource.CanSet(_generateValueOnAddConfigurationSource, Metadata.GenerateValueOnAdd.HasValue))
+            if (configurationSource.CanSet(_generateValueOnAddConfigurationSource, Metadata.GenerateValueOnAdd.HasValue)
+                || Metadata.GenerateValueOnAdd.Value == generateValue)
             {
-                _generateValueOnAddConfigurationSource = configurationSource;
+                if (_generateValueOnAddConfigurationSource == null
+                    && Metadata.GenerateValueOnAdd != null)
+                {
+                    _generateValueOnAddConfigurationSource = ConfigurationSource.Explicit;
+                }
+                else
+                {
+                    _generateValueOnAddConfigurationSource = configurationSource.Max(_generateValueOnAddConfigurationSource);
+                }
+
                 Metadata.GenerateValueOnAdd = generateValue;
                 return true;
             }
@@ -99,9 +135,19 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
         public virtual bool StoreComputed(bool storeComputed, ConfigurationSource configurationSource)
         {
-            if (configurationSource.CanSet(_isStoreComputedConfigurationSource, Metadata.IsStoreComputed.HasValue))
+            if (configurationSource.CanSet(_isStoreComputedConfigurationSource, Metadata.IsStoreComputed.HasValue)
+                || Metadata.IsStoreComputed == storeComputed)
             {
-                _isStoreComputedConfigurationSource = configurationSource;
+                if (_isStoreComputedConfigurationSource == null
+                    && Metadata.IsStoreComputed != null)
+                {
+                    _isStoreComputedConfigurationSource = ConfigurationSource.Explicit;
+                }
+                else
+                {
+                    _isStoreComputedConfigurationSource = configurationSource.Max(_isStoreComputedConfigurationSource);
+                }
+
                 Metadata.IsStoreComputed = storeComputed;
                 return true;
             }
@@ -111,9 +157,19 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
         public virtual bool UseStoreDefault(bool useDefault, ConfigurationSource configurationSource)
         {
-            if (configurationSource.CanSet(_useStoreDefaultConfigurationSource, Metadata.UseStoreDefault.HasValue))
+            if (configurationSource.CanSet(_useStoreDefaultConfigurationSource, Metadata.UseStoreDefault.HasValue)
+                || Metadata.UseStoreDefault.Value == useDefault)
             {
-                _useStoreDefaultConfigurationSource = configurationSource;
+                if (_useStoreDefaultConfigurationSource == null
+                    && Metadata.UseStoreDefault != null)
+                {
+                    _useStoreDefaultConfigurationSource = ConfigurationSource.Explicit;
+                }
+                else
+                {
+                    _useStoreDefaultConfigurationSource = configurationSource.Max(_useStoreDefaultConfigurationSource);
+                }
+
                 Metadata.UseStoreDefault = useDefault;
                 return true;
             }

@@ -660,24 +660,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
         }
 
         [Fact]
-        public void Navigation_to_principal_not_configured_if_navigation_to_dependent_is_ignored()
-        {
-            var modelBuilder = new InternalModelBuilder(new Model(), null);
-            var principalEntityBuilder = modelBuilder.Entity(typeof(Customer), ConfigurationSource.Explicit);
-            principalEntityBuilder.Key(new[] { Customer.IdProperty, Customer.UniqueProperty }, ConfigurationSource.Explicit);
-            var dependentEntityBuilder = modelBuilder.Entity(typeof(Order), ConfigurationSource.Explicit);
-            var foreignKeyBuilder = dependentEntityBuilder.ForeignKey(typeof(Customer).FullName, new[] { Order.CustomerIdProperty.Name, Order.CustomerUniqueProperty.Name }, ConfigurationSource.Convention);
-            Assert.True(dependentEntityBuilder.Navigation(Order.CustomerProperty.Name, foreignKeyBuilder.Metadata, pointsToPrincipal: true, configurationSource: ConfigurationSource.Convention));
-            Assert.True(principalEntityBuilder.Ignore(Customer.OrdersProperty.Name, ConfigurationSource.DataAnnotation));
-
-            Assert.False(dependentEntityBuilder.Navigations(null, Customer.OrdersProperty.Name, foreignKeyBuilder.Metadata, ConfigurationSource.Convention));
-
-            Assert.Null(foreignKeyBuilder.Metadata.GetNavigationToDependent());
-            Assert.Equal(Order.CustomerProperty.Name, foreignKeyBuilder.Metadata.GetNavigationToPrincipal().Name);
-        }
-
-        [Fact]
-        public void Navigation_to_dependent_not_configured_if_navigation_to_principal_conflicts()
+        public void Navigation_not_configured_if_it_conflicts_with_an_existing_one()
         {
             var modelBuilder = new InternalModelBuilder(new Model(), null);
             var principalEntityBuilder = modelBuilder.Entity(typeof(Customer), ConfigurationSource.Explicit);
@@ -688,7 +671,7 @@ namespace Microsoft.Data.Entity.Metadata.Internal
             Assert.True(dependentEntityBuilder.Navigation(Order.CustomerProperty.Name, foreignKeyBuilder.Metadata, pointsToPrincipal: true, configurationSource: ConfigurationSource.DataAnnotation));
             var newForeignKeyBuilder = dependentEntityBuilder.ForeignKey(typeof(Customer).FullName, new[] { Order.IdProperty.Name, Order.CustomerUniqueProperty.Name }, ConfigurationSource.Convention);
 
-            Assert.False(dependentEntityBuilder.Navigations(Order.CustomerProperty.Name, null, newForeignKeyBuilder.Metadata, ConfigurationSource.Convention));
+            Assert.False(dependentEntityBuilder.Navigation(Order.CustomerProperty.Name, newForeignKeyBuilder.Metadata, pointsToPrincipal: true, configurationSource: ConfigurationSource.Convention));
 
             Assert.Equal(Customer.OrdersProperty.Name, foreignKeyBuilder.Metadata.GetNavigationToDependent().Name);
             Assert.Equal(Order.CustomerProperty.Name, foreignKeyBuilder.Metadata.GetNavigationToPrincipal().Name);

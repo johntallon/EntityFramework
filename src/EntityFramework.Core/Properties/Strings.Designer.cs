@@ -796,6 +796,14 @@ namespace Microsoft.Data.Entity.Internal
             return string.Format(CultureInfo.CurrentCulture, GetString("NavigationAddedExplicitly", "navigation", "entityType"), navigation, entityType);
         }
 
+        /// <summary>
+        /// The principal entity type '{entityType}' requires a key to be defined.
+        /// </summary>
+        public static string PrincipalEntityTypeRequiresKey([CanBeNull] object entityType)
+        {
+            return string.Format(CultureInfo.CurrentCulture, GetString("PrincipalEntityTypeRequiresKey", "entityType"), entityType);
+        }
+
         private static string GetString(string name, params string[] formatterNames)
         {
             var value = _resourceManager.GetString(name);

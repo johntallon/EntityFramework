@@ -5734,6 +5734,72 @@ namespace Microsoft.Data.Entity.Tests.Metadata
         }
 
         [Fact]
+        public void OneToOne_throws_if_specified_FK_types_do_not_match()
+        {
+            var model = new Model();
+            var modelBuilder = new ModelBuilder(model);
+            modelBuilder.Entity<Customer>();
+            modelBuilder.Entity<CustomerDetails>().Property<Guid>("GuidProperty");
+            modelBuilder.Ignore<Order>();
+            
+            Assert.Equal(Strings.ForeignKeyTypeMismatch("'GuidProperty'", typeof(CustomerDetails).FullName, typeof(Customer).FullName),
+                Assert.Throws<InvalidOperationException>(() =>
+                    modelBuilder
+                        .Entity<Customer>()
+                        .OneToOne(c => c.Details, d => d.Customer)
+                        .ForeignKey(typeof(CustomerDetails), "GuidProperty")).Message);
+        }
+
+        [Fact]
+        public void OneToOne_throws_if_specified_FK_count_does_not_match()
+        {
+            var model = new Model();
+            var modelBuilder = new ModelBuilder(model);
+            modelBuilder.Entity<Customer>();
+            modelBuilder.Entity<CustomerDetails>().Property<Guid>("GuidProperty");
+            modelBuilder.Ignore<Order>();
+            
+            Assert.Equal(Strings.ForeignKeyCountMismatch("'Id', 'GuidProperty'", typeof(CustomerDetails).FullName, "'Id'", typeof(Customer).FullName),
+                Assert.Throws<InvalidOperationException>(() =>
+                    modelBuilder
+                        .Entity<Customer>()
+                        .OneToOne(c => c.Details, d => d.Customer)
+                        .ForeignKey(typeof(CustomerDetails), "Id", "GuidProperty")).Message);
+        }
+
+        [Fact]
+        public void OneToOne_throws_if_principal_entity_type_has_no_PK()
+        {
+            var model = new Model();
+            var modelBuilder = new ModelBuilder(model);
+            modelBuilder.Entity<CustomerDetails>().Key(e => e.Id);
+            modelBuilder.Ignore<Order>();
+
+            var dependentType = model.GetEntityType(typeof(CustomerDetails));
+            var principalType = model.GetEntityType(typeof(Customer));
+
+            foreach (var navigation in dependentType.Navigations.ToList())
+            {
+                dependentType.RemoveNavigation(navigation);
+            }
+            foreach (var navigation in principalType.Navigations.ToList())
+            {
+                principalType.RemoveNavigation(navigation);
+            }
+            foreach (var foreignKey in dependentType.ForeignKeys.ToList())
+            {
+                dependentType.RemoveForeignKey(foreignKey);
+            }
+            principalType.SetPrimaryKey((Property)null);
+
+            Assert.Equal(Strings.PrincipalEntityTypeRequiresKey(principalType.Name),
+                Assert.Throws<InvalidOperationException>(() =>
+                    modelBuilder
+                        .Entity<Customer>()
+                        .OneToOne(c => c.Details, d => d.Customer)).Message);
+        }
+
+        [Fact]
         public void Can_convert_to_non_convention_builder()
         {
             var model = new Model();

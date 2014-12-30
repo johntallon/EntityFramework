@@ -163,47 +163,6 @@ namespace Microsoft.Data.Entity.Metadata.Internal
             return true;
         }
 
-        public virtual bool Navigations(
-            [CanBeNull] string navigationToPrincipalName,
-            [CanBeNull] string navigationToDependentName,
-            [NotNull] ForeignKey foreignKey,
-            ConfigurationSource configurationSource)
-        {
-            Check.NotNull(foreignKey, "foreignKey");
-
-            var dependentEntityTypeBuilder = ModelBuilder.Entity(foreignKey.EntityType.Name, configurationSource);
-            if (!dependentEntityTypeBuilder.CanSetNavigation(
-                navigationToPrincipalName,
-                foreignKey,
-                pointsToPrincipal: true,
-                configurationSource: configurationSource,
-                canOverrideSameSource: true))
-            {
-                return false;
-            }
-
-            var principalEntityTypeBuilder = ModelBuilder.Entity(foreignKey.ReferencedEntityType.Name, configurationSource);
-            if (!principalEntityTypeBuilder.CanSetNavigation(
-                navigationToDependentName,
-                foreignKey,
-                pointsToPrincipal: false,
-                configurationSource: configurationSource,
-                canOverrideSameSource: true))
-            {
-                return false;
-            }
-
-            var navigationToPrincipalSet = dependentEntityTypeBuilder
-                .Navigation(navigationToPrincipalName, foreignKey, pointsToPrincipal: true, configurationSource: configurationSource);
-            Debug.Assert(navigationToPrincipalSet);
-
-            var navigationToDependentSet = principalEntityTypeBuilder
-                .Navigation(navigationToDependentName, foreignKey, pointsToPrincipal: false, configurationSource: configurationSource);
-            Debug.Assert(navigationToDependentSet);
-
-            return true;
-        }
-
         private bool CanRemove(ForeignKey foreignKey, ConfigurationSource configurationSource, bool canOverrideSameSource)
         {
             if (foreignKey.EntityType != Metadata)
@@ -701,7 +660,17 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
             var principalEntityType = principalEntityTypeBuilder.Metadata;
             var dependentEntityType = dependentEntityTypeBuilder.Metadata;
+            
+            if (principalEntityType.TryGetPrimaryKey() == null)
+            {
+                if (configurationSource == ConfigurationSource.Explicit)
+                {
+                    throw new InvalidOperationException(Strings.PrincipalEntityTypeRequiresKey(principalEntityType.Name));
+                }
 
+                return null;
+            }
+            
             var navigationToPrincipal = navigationToPrincipalName == null
                 ? null
                 : dependentEntityType.TryGetNavigation(navigationToPrincipalName);
@@ -748,8 +717,13 @@ namespace Microsoft.Data.Entity.Metadata.Internal
 
             _relationshipBuilders.Value.Add(foreignKey, relationshipBuilder, configurationSource);
 
-            var navigationsSet = Navigations(navigationToPrincipalName, navigationToDependentName, foreignKey, configurationSource);
-            Debug.Assert(navigationsSet);
+            var navigationToPrincipalSet = dependentEntityTypeBuilder
+                .Navigation(navigationToPrincipalName, foreignKey, pointsToPrincipal: true, configurationSource: configurationSource);
+            Debug.Assert(navigationToPrincipalSet);
+
+            var navigationToDependentSet = principalEntityTypeBuilder
+                .Navigation(navigationToDependentName, foreignKey, pointsToPrincipal: false, configurationSource: configurationSource);
+            Debug.Assert(navigationToDependentSet);
 
             return relationshipBuilder;
         }

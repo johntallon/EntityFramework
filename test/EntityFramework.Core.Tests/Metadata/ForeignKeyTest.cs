@@ -158,7 +158,7 @@ namespace Microsoft.Data.Entity.Tests.Metadata
         }
 
         [Fact]
-        public void IsRequired_false_when_any_part_of_composite_FK_is_nullable()
+        public void IsRequired_false_for_composite_FK_by_default()
         {
             var entityType = new Model().AddEntityType("E");
             entityType.GetOrSetPrimaryKey(new[]
@@ -174,6 +174,30 @@ namespace Microsoft.Data.Entity.Tests.Metadata
 
             Assert.Null(foreignKey.IsRequired);
             Assert.False(((IForeignKey)foreignKey).IsRequired);
+        }
+
+        [Fact]
+        public void IsRequired_false_when_any_part_of_composite_FK_is_nullable()
+        {
+            var entityType = new Model().AddEntityType("E");
+            entityType.GetOrSetPrimaryKey(new[]
+                {
+                    entityType.GetOrAddProperty("Id1", typeof(int), shadowProperty: true),
+                    entityType.GetOrAddProperty("Id2", typeof(string), shadowProperty: true)
+                });
+
+            var dependentProp1 = entityType.GetOrAddProperty("P1", typeof(int), shadowProperty: true);
+            var dependentProp2 = entityType.GetOrAddProperty("P2", typeof(string), shadowProperty: true);
+            dependentProp2.IsNullable = true;
+
+            var foreignKey = new ForeignKey(new[] { dependentProp1, dependentProp2 }, entityType.GetPrimaryKey());
+
+            Assert.False(foreignKey.IsRequired.Value);
+            Assert.False(((IForeignKey)foreignKey).IsRequired);
+
+            dependentProp2.IsNullable = false;
+
+            Assert.True(foreignKey.IsRequired.Value);
         }
 
         [Fact]

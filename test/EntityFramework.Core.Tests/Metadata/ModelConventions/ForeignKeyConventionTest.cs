@@ -329,11 +329,30 @@ namespace Microsoft.Data.Entity.Tests.Metadata.ModelConventions
                 "SomeNav",
                 null,
                 null,
-                isUnique: false);
+                isUnique: true);
 
             Assert.Same(fkProperty, fk.Properties.Single());
             Assert.Same(PrimaryKey, fk.ReferencedProperties.Single());
-            Assert.False(fk.IsUnique);
+            Assert.True(fk.IsUnique);
+            Assert.True(fk.IsRequired);
+        }
+
+        [Fact]
+        public void Creates_foreign_key_over_matching_dependent_PK_for_unique_FK()
+        {
+            var fkProperty = DependentType.GetPrimaryKey().Properties.Single();
+
+            var fk = (IForeignKey)new ForeignKeyConvention().CreateForeignKeyByConvention(
+                PrincipalType,
+                DependentType,
+                "SomeNav",
+                null,
+                null,
+                isUnique: true);
+
+            Assert.Same(fkProperty, fk.Properties.Single());
+            Assert.Same(PrimaryKey, fk.ReferencedProperties.Single());
+            Assert.True(fk.IsUnique);
             Assert.True(fk.IsRequired);
         }
 
