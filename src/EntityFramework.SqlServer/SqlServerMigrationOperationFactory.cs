@@ -4,8 +4,8 @@
 using System;
 using JetBrains.Annotations;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Migrations;
-using Microsoft.Data.Entity.Migrations.Model;
+using Microsoft.Data.Entity.Relational;
+using Microsoft.Data.Entity.Relational.MigrationsModel;
 using Microsoft.Data.Entity.SqlServer.Metadata;
 
 namespace Microsoft.Data.Entity.SqlServer

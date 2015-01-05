@@ -60,7 +60,25 @@
     <Compile Include="..\Shared\LoggingExtensions.cs">
       <Link>LoggingExtensions.cs</Link>
     </Compile>
+    <Compile Include="Builders\ColumnBuilder.cs" />
+    <Compile Include="Builders\MigrationBuilder.cs" />
+    <Compile Include="Builders\TableBuilder.cs" />
+    <Compile Include="Extensions\MigrationsDbContextOptionsExtensions.cs" />
     <Compile Include="IDbCommandExecutor.cs" />
+    <Compile Include="IMigrationOperationSqlGeneratorFactory.cs" />
+    <Compile Include="IMigrationsEnabledDatabaseInternals.cs" />
+    <Compile Include="Infrastructure\ContextTypeAttribute.cs" />
+    <Compile Include="Infrastructure\HistoryRepository.cs" />
+    <Compile Include="Infrastructure\HistoryRow.cs" />
+    <Compile Include="Infrastructure\IMigrationMetadata.cs" />
+    <Compile Include="Infrastructure\MigrationAssembly.cs" />
+    <Compile Include="Infrastructure\MigrationInfo.cs" />
+    <Compile Include="Infrastructure\MigrationMetadataExtensions.cs" />
+    <Compile Include="Infrastructure\MigrationsDataStoreServices.cs" />
+    <Compile Include="Infrastructure\Migrator.cs" />
+    <Compile Include="Infrastructure\MigratorLoggerEventIds.cs" />
+    <Compile Include="Infrastructure\MigratorLoggerExtensions.cs" />
+    <Compile Include="Infrastructure\ModelSnapshot.cs" />
     <Compile Include="Metadata\IRelationalEntityTypeExtensions.cs" />
     <Compile Include="Metadata\IRelationalForeignKeyExtensions.cs" />
     <Compile Include="Metadata\IRelationalIndexExtensions.cs" />
@@ -90,6 +108,50 @@
     <Compile Include="Metadata\RelationalPropertyBuilder.cs" />
     <Compile Include="Metadata\RelationalSequenceBuilder.cs" />
     <Compile Include="Metadata\Sequence.cs" />
+    <Compile Include="Migration.cs" />
+    <Compile Include="MigrationCodeGenerator.cs" />
+    <Compile Include="MigrationOperationCollection.cs" />
+    <Compile Include="MigrationOperationFactory.cs" />
+    <Compile Include="MigrationOperationProcessor.cs" />
+    <Compile Include="MigrationOperationSqlGenerator.cs" />
+    <Compile Include="MigrationsDatabaseExtensions.cs" />
+    <Compile Include="MigrationsEnabledDatabase.cs" />
+    <Compile Include="MigrationsEntityServicesBuilderExtensions.cs" />
+    <Compile Include="MigrationsOptionsExtension.cs" />
+    <Compile Include="ModelCodeGenerator.cs" />
+    <Compile Include="ModelDiffer.cs" />
+    <Compile Include="MigrationsModel\AddColumnOperation.cs" />
+    <Compile Include="MigrationsModel\AddDefaultConstraintOperation.cs" />
+    <Compile Include="MigrationsModel\AddForeignKeyOperation.cs" />
+    <Compile Include="MigrationsModel\AddPrimaryKeyOperation.cs" />
+    <Compile Include="MigrationsModel\AddUniqueConstraintOperation.cs" />
+    <Compile Include="MigrationsModel\AlterColumnOperation.cs" />
+    <Compile Include="MigrationsModel\AlterSequenceOperation.cs" />
+    <Compile Include="MigrationsModel\Column.cs" />
+    <Compile Include="MigrationsModel\CopyDataOperation.cs" />
+    <Compile Include="MigrationsModel\CreateDatabaseOperation.cs" />
+    <Compile Include="MigrationsModel\CreateIndexOperation.cs" />
+    <Compile Include="MigrationsModel\CreateSequenceOperation.cs" />
+    <Compile Include="MigrationsModel\CreateTableOperation.cs" />
+    <Compile Include="MigrationsModel\DropColumnOperation.cs" />
+    <Compile Include="MigrationsModel\DropDatabaseOperation.cs" />
+    <Compile Include="MigrationsModel\DropDefaultConstraintOperation.cs" />
+    <Compile Include="MigrationsModel\DropForeignKeyOperation.cs" />
+    <Compile Include="MigrationsModel\DropIndexOperation.cs" />
+    <Compile Include="MigrationsModel\DropPrimaryKeyOperation.cs" />
+    <Compile Include="MigrationsModel\DropSequenceOperation.cs" />
+    <Compile Include="MigrationsModel\DropTableOperation.cs" />
+    <Compile Include="MigrationsModel\DropUniqueConstraintOperation.cs" />
+    <Compile Include="MigrationsModel\IMigrationOperationVisitor.cs" />
+    <Compile Include="MigrationsModel\MigrationOperation.cs" />
+    <Compile Include="MigrationsModel\MigrationOperationVisitor.cs" />
+    <Compile Include="MigrationsModel\MoveSequenceOperation.cs" />
+    <Compile Include="MigrationsModel\MoveTableOperation.cs" />
+    <Compile Include="MigrationsModel\RenameColumnOperation.cs" />
+    <Compile Include="MigrationsModel\RenameIndexOperation.cs" />
+    <Compile Include="MigrationsModel\RenameSequenceOperation.cs" />
+    <Compile Include="MigrationsModel\RenameTableOperation.cs" />
+    <Compile Include="MigrationsModel\SqlOperation.cs" />
     <Compile Include="Query\AsyncQueryingEnumerable.cs" />
     <Compile Include="Query\AsyncQueryMethodProvider.cs" />
     <Compile Include="Query\CommandBuilder.cs" />
@@ -181,15 +243,20 @@
     <Compile Include="Update\ParameterNameGenerator.cs" />
     <Compile Include="Update\ParameterNameGeneratorFactory.cs" />
     <Compile Include="Update\SingularModificationCommandBatch.cs" />
-    <Compile Include="..\Shared\Check.cs" >
-        <Link>Utilities\Check.cs</Link>
+    <Compile Include="..\Shared\Check.cs">
+      <Link>Utilities\Check.cs</Link>
     </Compile>
     <Compile Include="..\Shared\CodeAnnotations.cs" />
     <Compile Include="..\Shared\StringBuilderExtensions.cs" />
     <Compile Include="..\Shared\SharedTypeExtensions.cs" />
+    <Compile Include="Utilities\AssemblyExtensions.cs" />
+    <Compile Include="Utilities\EnumerableExtensions.cs" />
     <Compile Include="Utilities\ExpressionExtensions.cs" />
     <Compile Include="Utilities\MethodInfoExtensions.cs" />
     <Compile Include="Metadata\RelationalNameBuilder.cs" />
+    <Compile Include="Utilities\MigrationExtensions.cs" />
+    <Compile Include="Utilities\PropertyInfoExtensions.cs" />
+    <Compile Include="Utilities\TypeExtensions.cs" />
     <EmbeddedResource Include="Properties\Strings.resx">
       <LogicalName>EntityFramework.Relational.Strings.resources</LogicalName>
       <SubType>Designer</SubType>
@@ -199,6 +266,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Resources.cs</LastGenOutput>
     </Content>
+    <None Include="EntityFramework.Relational.kproj" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

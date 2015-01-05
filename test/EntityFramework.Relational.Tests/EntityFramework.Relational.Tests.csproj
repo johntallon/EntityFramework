@@ -71,13 +71,60 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\MigrationsTestHelpers.cs">
+      <Link>MigrationsTestHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\RelationalTestHelpers.cs">
       <Link>RelationalTestHelpers.cs</Link>
     </Compile>
     <Compile Include="ApiConsistencyTest.cs" />
+    <Compile Include="Builders\ColumnBuilderTest.cs" />
+    <Compile Include="Builders\MigrationBuilderTest.cs" />
+    <Compile Include="Builders\TableBuilderTest.cs" />
+    <Compile Include="Infrastructure\ContextTypeAttributeTest.cs" />
+    <Compile Include="Infrastructure\HistoryRepositoryTest.cs" />
+    <Compile Include="Infrastructure\MigrationAssemblyTest.cs" />
+    <Compile Include="Infrastructure\MigrationInfoTest.cs" />
+    <Compile Include="Infrastructure\MigratorTest.cs" />
     <Compile Include="Metadata\RelationalMetadataExtensionsTest.cs" />
     <Compile Include="Metadata\RelationalNameBuilderTest.cs" />
     <Compile Include="Metadata\SequenceTest.cs" />
+    <Compile Include="MigrationOperationFactoryTest.cs" />
+    <Compile Include="MigrationOperationSqlGeneratorTest.cs" />
+    <Compile Include="MigrationsDatabaseExtensionsTest.cs" />
+    <Compile Include="MigrationsDbContextOptionsExtensionsTest.cs" />
+    <Compile Include="MigrationsEntityServicesBuilderExtensionsTest.cs" />
+    <Compile Include="MigrationsModel\AddColumnOperationTest.cs" />
+    <Compile Include="MigrationsModel\AddDefaultConstraintOperationTest.cs" />
+    <Compile Include="MigrationsModel\AddForeignKeyOperationTest.cs" />
+    <Compile Include="MigrationsModel\AddPrimaryKeyOperationTest.cs" />
+    <Compile Include="MigrationsModel\AddUniqueConstraintOperationTest.cs" />
+    <Compile Include="MigrationsModel\AlterColumnOperationTest.cs" />
+    <Compile Include="MigrationsModel\AlterSequenceOperationTest.cs" />
+    <Compile Include="MigrationsModel\ColumnTest.cs" />
+    <Compile Include="MigrationsModel\CopyDataOperationTest.cs" />
+    <Compile Include="MigrationsModel\CreateDatabaseOperationTest.cs" />
+    <Compile Include="MigrationsModel\CreateIndexOperationTest.cs" />
+    <Compile Include="MigrationsModel\CreateSequenceOperationTest.cs" />
+    <Compile Include="MigrationsModel\CreateTableOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropColumnOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropDatabaseOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropDefaultConstraintOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropForeignKeyOperation.cs" />
+    <Compile Include="MigrationsModel\DropIndexOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropPrimaryKeyOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropSequenceOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropTableOperationTest.cs" />
+    <Compile Include="MigrationsModel\DropUniqueConstraintOperationTest.cs" />
+    <Compile Include="MigrationsModel\MoveSequenceOperationTest.cs" />
+    <Compile Include="MigrationsModel\MoveTableOperationTest.cs" />
+    <Compile Include="MigrationsModel\RenameColumnOperationTest.cs" />
+    <Compile Include="MigrationsModel\RenameIndexOperationTest.cs" />
+    <Compile Include="MigrationsModel\RenameSequenceOperationTest.cs" />
+    <Compile Include="MigrationsModel\RenameTableOperationTest.cs" />
+    <Compile Include="MigrationsModel\SqlOperationTest.cs" />
+    <Compile Include="MigrationTest.cs" />
+    <Compile Include="ModelDifferTest.cs" />
     <Compile Include="Model\RelationalTypeMappingTest.cs" />
     <Compile Include="Metadata\RelationalBuilderExtensionsTest.cs" />
     <Compile Include="RelationalConnectionTest.cs" />
@@ -105,6 +152,7 @@
     <Compile Include="Utilities\StringBuilderExtensionsTest.cs" />
     <Compile Include="..\Shared\ApiConsistencyTestBase.cs" />
     <Compile Include="..\Shared\TestHelpers.cs" />
+    <None Include="EntityFramework.Relational.Tests.kproj" />
     <None Include="packages.config" />
     <None Include="project.json" />
   </ItemGroup>
