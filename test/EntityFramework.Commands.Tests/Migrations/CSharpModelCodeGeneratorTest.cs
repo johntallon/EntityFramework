@@ -4,7 +4,7 @@
 using System;
 using Microsoft.Data.Entity.Commands.Migrations;
 using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Relational.Infrastructure;
+using Microsoft.Data.Entity.Relational.Migrations.Infrastructure;
 using Microsoft.Data.Entity.Utilities;
 using Xunit;
 
